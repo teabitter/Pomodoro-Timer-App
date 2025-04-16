@@ -10,6 +10,8 @@ using System.Windows.Forms;
 using System.Media;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using Newtonsoft.Json;
+using NAudio.Wave;
 
 namespace Pomodoro
 {
@@ -18,13 +20,17 @@ namespace Pomodoro
         private int timeLeft; //in seconds
         private bool isWorkTime = true; //true for work, false for break
         private int pomodoroCount = 0;
+        private int pomodorosCompleted = 0;
 
         
 
         public Form1()
         {
             InitializeComponent();
+            this.FormClosing += new FormClosingEventHandler(Form1_Close);
             ResetTimer();
+            LoadTasks();
+
         }
         private void ResetTimer()
         {
@@ -73,6 +79,8 @@ namespace Pomodoro
                 if (isWorkTime)
                 {
                     pomodoroCount++;
+                    pomodorosCompleted++; // Increment pomodoros only when a work session is completed.
+                    UpdatePomodoroProgress(); // Only show a tomato after a work session.
                 }
 
                 isWorkTime = !isWorkTime;
@@ -80,23 +88,24 @@ namespace Pomodoro
                 if (!isWorkTime)
                 {
                     if (pomodoroCount % 4 == 0)
-                        timeLeft = 15 * 60; //long break
+                        timeLeft = 15 * 60; // long break
                     else
-                        timeLeft = 5 * 60; //short break
+                        timeLeft = 5 * 60; // short break
                 }
                 else
                 {
-                    timeLeft = 25 * 60;
+                    timeLeft = 25 * 60; // reset to 25 minutes for next work session
                 }
+
                 lblMode.Text = isWorkTime ? "Work Time" : (pomodoroCount % 4 == 0 ? "Long Break" : "Short Break");
                 UpdateTimerLabel();
                 pomodoroTimer.Start();
 
-                SystemSounds.Exclamation.Play(); //plays system sound
-                //SoundPlayer player = new SoundPlayer(@"C:\path\to\sound.wav");
-                //player.Play(); THIS IS FOR A CUSTOM SOUND
+                SoundPlayer player = new SoundPlayer(@"C:\users\dambn\Downloads\bell-172780.wav");
+                player.Play();
             }
         }
+
         private void btnAddTask_Click(object sender, EventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(txtNewTasks.Text))
@@ -125,91 +134,60 @@ namespace Pomodoro
                 lstTasks.Items.RemoveAt(lstTasks.SelectedIndex);
             }
         }
-
-        private void ApplyDarkTheme()
-        {
-            // Form background
-            this.BackColor = Color.FromArgb(30, 30, 30); // dark gray
-
-            // Labels
-            lblTimer.ForeColor = Color.White;
-            lblMode.ForeColor = Color.White;
-
-            //List
-            lstTasks.BackColor = Color.FromArgb(50, 50, 50);
-            lstTasks.ForeColor = Color.White;
-            lstTasks.BorderStyle = BorderStyle.FixedSingle;
-
-            // Progress Bar
-            progressBar1.ForeColor = Color.White;
-            progressBar1.BackColor = Color.Gray;
-
-            // Buttons
-            Button[] buttons = { btnStart, btnPause, btnReset, btnAddTask, btnDone, btnRemove };
-            foreach (var btn in buttons)
-            {
-                btn.BackColor = Color.FromArgb(50, 50, 50);
-                btn.ForeColor = Color.White;
-                btn.FlatStyle = FlatStyle.Flat;
-                btn.FlatAppearance.BorderColor = Color.DarkGray;
-            }
-
-            // Checkbox
-            chkDarkMode.ForeColor = Color.White;
-            chkDarkMode.BackColor = Color.FromArgb(30, 30, 30);
-
-            // Textbox
-            txtNewTasks.BackColor = Color.FromArgb(50, 50, 50);
-            txtNewTasks.ForeColor = Color.White;
-            txtNewTasks.BorderStyle = BorderStyle.FixedSingle;
-        }
-
-        private void ApplyLightTheme()
-        {
-            this.BackColor = Color.White;
-
-            lblTimer.ForeColor = Color.Black;
-            lblMode.ForeColor = Color.Black;
-
-            //List
-            lstTasks.BackColor = Color.White;
-            lstTasks.ForeColor = Color.Black;
-
-
-
-            progressBar1.ForeColor = Color.Black;
-            progressBar1.BackColor = Color.LightGray;
-
-            Button[] buttons = { btnStart, btnPause, btnReset, btnAddTask, btnDone, btnRemove };
-            foreach (var btn in buttons)
-            {
-                btn.BackColor = Color.WhiteSmoke;
-                btn.ForeColor = Color.Black;
-                btn.FlatStyle = FlatStyle.Standard;
-            }
-
-            chkDarkMode.ForeColor = Color.Black;
-            chkDarkMode.BackColor = Color.White;
-
-            txtNewTasks.BackColor = Color.White;
-            txtNewTasks.ForeColor = Color.Black;
-        }
-
         private void chkDarkMode_CheckedChanged(object sender, EventArgs e)
         {
             if (chkDarkMode.Checked)
-                ApplyDarkTheme();
+                ThemeManager.ApplyDarkTheme(this);
             else
-                ApplyLightTheme();
+                ThemeManager.ApplyLightTheme(this);
+        }
+
+        private void LoadTasks()
+        {
+            if (File.Exists("tasks.json"))
+            {
+                string json = File.ReadAllText("tasks.json");
+                List<TaskItem> tasks = JsonConvert.DeserializeObject<List<TaskItem>>(json);
+
+                lstTasks.Items.Clear();
+                foreach (var task in tasks)
+                {
+                    string displayText = task.IsCompleted ? $"✓ {task.Description}" : task.Description;
+                    lstTasks.Items.Add(displayText);
+                }
+            }
+        }
+
+        private void UpdatePomodoroProgress()
+        {
+            lblPomodoroProgress.Text = string.Concat(Enumerable.Repeat("🍅", pomodorosCompleted));
         }
 
         private void Form1_Close(object sender, EventArgs e)
         {
-           
+            List<TaskItem> tasks = new List<TaskItem>();
+            foreach (var item in lstTasks.Items)
+            {
+                string taskText = item.ToString();
+                bool isCompleted = taskText.StartsWith("✓");
+                string description = isCompleted ? taskText.Substring(2) : taskText;
+
+                tasks.Add(new TaskItem
+                {
+                    Description = description,
+                    IsCompleted = isCompleted
+                });
+            }
+            string json = JsonConvert.SerializeObject(tasks, Formatting.Indented);
+            File.WriteAllText("tasks.json", json);
         }
+
+        
+
+
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            
         }
 
         private void label1_Click(object sender, EventArgs e)

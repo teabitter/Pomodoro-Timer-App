@@ -42,6 +42,7 @@
             this.chkDarkMode = new System.Windows.Forms.CheckBox();
             this.btnDone = new System.Windows.Forms.Button();
             this.btnRemove = new System.Windows.Forms.Button();
+            this.lblPomodoroProgress = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lblTimer
@@ -119,9 +120,9 @@
             // 
             // btnAddTask
             // 
-            this.btnAddTask.Location = new System.Drawing.Point(441, 683);
+            this.btnAddTask.Location = new System.Drawing.Point(414, 683);
             this.btnAddTask.Name = "btnAddTask";
-            this.btnAddTask.Size = new System.Drawing.Size(113, 50);
+            this.btnAddTask.Size = new System.Drawing.Size(140, 50);
             this.btnAddTask.TabIndex = 7;
             this.btnAddTask.Text = "Add";
             this.btnAddTask.UseVisualStyleBackColor = true;
@@ -147,9 +148,9 @@
             // 
             // btnDone
             // 
-            this.btnDone.Location = new System.Drawing.Point(441, 739);
+            this.btnDone.Location = new System.Drawing.Point(414, 739);
             this.btnDone.Name = "btnDone";
-            this.btnDone.Size = new System.Drawing.Size(113, 50);
+            this.btnDone.Size = new System.Drawing.Size(140, 50);
             this.btnDone.TabIndex = 11;
             this.btnDone.Text = "Done";
             this.btnDone.UseVisualStyleBackColor = true;
@@ -157,19 +158,28 @@
             // 
             // btnRemove
             // 
-            this.btnRemove.Location = new System.Drawing.Point(441, 795);
+            this.btnRemove.Location = new System.Drawing.Point(414, 795);
             this.btnRemove.Name = "btnRemove";
-            this.btnRemove.Size = new System.Drawing.Size(113, 50);
+            this.btnRemove.Size = new System.Drawing.Size(140, 50);
             this.btnRemove.TabIndex = 12;
             this.btnRemove.Text = "Remove";
             this.btnRemove.UseVisualStyleBackColor = true;
             this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
+            // 
+            // lblPomodoroProgress
+            // 
+            this.lblPomodoroProgress.AutoSize = true;
+            this.lblPomodoroProgress.Location = new System.Drawing.Point(13, 13);
+            this.lblPomodoroProgress.Name = "lblPomodoroProgress";
+            this.lblPomodoroProgress.Size = new System.Drawing.Size(0, 25);
+            this.lblPomodoroProgress.TabIndex = 13;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(634, 909);
+            this.Controls.Add(this.lblPomodoroProgress);
             this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.btnDone);
             this.Controls.Add(this.chkDarkMode);
@@ -205,6 +215,7 @@
         private System.Windows.Forms.CheckBox chkDarkMode;
         private System.Windows.Forms.Button btnDone;
         private System.Windows.Forms.Button btnRemove;
+        private System.Windows.Forms.Label lblPomodoroProgress;
     }
 }
 
