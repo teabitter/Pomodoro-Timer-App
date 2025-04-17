@@ -18,7 +18,7 @@ This is a Pomodoro timer application that helps you stay focused and manage task
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/teabitter/pomodoro-timer-app.git
+   git clone https://github.com/teabitter/Pomodoro-Timer-App.git
    ```
 
 2. Open the solution in Visual Studio.
